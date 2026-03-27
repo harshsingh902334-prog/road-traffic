@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Traffic Control System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #0b0e12;
+      --panel: #111418;
+      --sur: #181c22;
+      --brd: #252b34;
+      --brd2: #2f3640;
+      --txt: #c8cdd4;
+      --tdim: #5a6370;
+      --tmut: #38404a;
+      --white: #e8ecf0;
+      --grn: #39e07a;
+      --gd: #0f2a1c;
+      --red: #e84040;
+      --rd: #280f0f;
+      --yel: #f0b830;
+      --yd: #281e08;
+      --blu: #3ab0e8;
+      --bd: #0a1e2e;
+      --mono: 'Share Tech Mono', monospace;
+      --head: 'Rajdhani', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--txt);
+      font-family: var(--head);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      font-weight: 500;
+    }
+
+    /* HEADER */
+    .hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      background: var(--panel);
+      border-bottom: 2px solid var(--brd2);
+      height: 52px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .hdr::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blu), transparent);
+      opacity: 0.35;
+    }
+
+    .hd-l { display: flex; align-items: center; gap: 14px; }
+
+    /* Back to home button in header */
+    .back-btn {
+      display: flex; align-items: center; gap: 6px;
+      text-decoration: none;
+      background: var(--sur);
+      border: 1px solid var(--brd2);
+      border-radius: 3px;
+      padding: 5px 12px;
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--tdim);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .back-btn:hover {
+      border-color: var(--blu);
+      color: var(--blu);
+      background: var(--bd);
+    }
+    .back-btn svg { flex-shrink: 0; }
+
+    .badge {
+      background: var(--bd);
+      border: 1px solid var(--blu);
+      border-radius: 3px;
+      padding: 4px 10px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--blu);
+      letter-spacing: 2px;
+    }
+
+    .hd-title {
+      font-size: 19px; font-weight: 700;
+      color: var(--white); letter-spacing: 3px; text-transform: uppercase;
+    }
+    .hd-sub { font-family: var(--mono); font-size: 9px; color: var(--tdim); letter-spacing: 1px; margin-top: 1px; }
+
+    .hd-r { display: flex; align-items: center; gap: 18px; }
+
+    .live {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--gd); border: 1px solid #1f5e38; border-radius: 3px;
+      padding: 4px 10px; font-family: var(--mono); font-size: 10px;
+      color: var(--grn); letter-spacing: 2px;
+    }
+    .dot { width: 6px; height: 6px; background: var(--grn); border-radius: 50%; animation: blink 1.6s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+    .clk { font-family: var(--mono); font-size: 15px; color: var(--white); letter-spacing: 3px; }
+
+    /* EMERGENCY BANNER */
+    .emgb { display: none; background: var(--rd); border-bottom: 1px solid var(--red); padding: 6px 20px; text-align: center; flex-shrink: 0; }
+    .emgb.on { display: block; }
+    .emgt { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--red); letter-spacing: 3px; text-transform: uppercase; animation: fl 0.9s ease-in-out infinite alternate; }
+    @keyframes fl { from{opacity:1} to{opacity:0.4} }
+
+    /* TOPBAR */
+    .topbar {
+      display: flex; align-items: center;
+      background: var(--panel); border-bottom: 1px solid var(--brd);
+      height: 46px; flex-shrink: 0; padding: 0 16px; gap: 0;
+    }
+    .tst {
+      display: flex; align-items: center; gap: 8px;
+      padding: 0 20px; border-right: 1px solid var(--brd); height: 100%;
+    }
+    .tst:first-child { padding-left: 4px; }
+    .tst-l { font-family: var(--mono); font-size: 9px; color: var(--tmut); letter-spacing: 1px; text-transform: uppercase; }
+    .tst-v { font-family: var(--mono); font-size: 15px; font-weight: 600; color: var(--white); margin-top: 1px; }
+    .tst-v.ok { color: var(--grn); font-size: 11px; }
+    .tst-v.err { color: var(--red); font-size: 11px; }
+    .tst-v.bl { color: var(--blu); }
+    .sp { flex: 1; }
+
+    .rbtn {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--sur); border: 1px solid var(--brd2); border-radius: 3px;
+      padding: 7px 16px; cursor: pointer;
+      font-family: var(--mono); font-size: 10px; color: var(--txt);
+      letter-spacing: 1px; text-transform: uppercase; transition: all 0.2s;
+    }
+    .rbtn:hover { background: var(--bd); border-color: var(--blu); color: var(--blu); }
+
+    /* GRID */
+    .grid {
+      display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+      gap: 1px; background: var(--brd); flex: 1; min-height: 0; padding-bottom: 28px;
+    }
+
+    .cam { background: var(--bg); display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+    .cam-top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 5px 12px; background: var(--panel); border-bottom: 1px solid var(--brd);
+      flex-shrink: 0; border-left: 3px solid var(--rd); transition: border-color 0.3s;
+    }
+    .cam.sg .cam-top { border-left-color: var(--grn); }
+    .cam.sy .cam-top { border-left-color: var(--yel); }
+    .cam.sr .cam-top { border-left-color: var(--red); }
+    .cam.se .cam-top { border-left-color: var(--grn); }
+    .cname { font-size: 13px; font-weight: 700; color: var(--white); letter-spacing: 3px; }
+    .cid { font-family: var(--mono); font-size: 9px; color: var(--tmut); letter-spacing: 1px; }
+
+    .vw { flex: 1; position: relative; overflow: hidden; background: #060809; min-height: 0; }
+    .vw video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .vw::after {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px);
+      pointer-events: none; z-index: 2;
+    }
+    .nof { display: none; position: absolute; inset: 0; z-index: 3; background: #070909; align-items: center; justify-content: center; flex-direction: column; gap: 6px; }
+    .nof.on { display: flex; }
+    .nof-i { font-size: 22px; opacity: 0.25; }
+    .nof-t { font-family: var(--mono); font-size: 9px; color: var(--tmut); letter-spacing: 2px; }
+    .vcnt { position: absolute; bottom: 8px; left: 8px; z-index: 4; background: rgba(17,20,24,0.88); border: 1px solid var(--brd2); border-radius: 2px; padding: 3px 8px; font-family: var(--mono); font-size: 10px; color: var(--txt); letter-spacing: 0.5px; }
+    .etag { display: none; position: absolute; top: 8px; right: 8px; z-index: 6; background: var(--rd); border: 1px solid var(--red); border-radius: 2px; padding: 3px 8px; font-family: var(--mono); font-size: 9px; font-weight: 600; color: var(--red); letter-spacing: 2px; animation: fl 0.8s ease-in-out infinite alternate; }
+    .etag.on { display: block; }
+    .stov { position: absolute; inset: 0; z-index: 5; display: none; align-items: center; justify-content: center; background: rgba(6,8,10,0.65); backdrop-filter: blur(3px); }
+    .stov.on { display: flex; }
+    .si { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .sb { width: 52px; height: 52px; background: var(--rd); border: 2px solid var(--red); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: var(--red); letter-spacing: 3px; }
+    .ss { font-family: var(--mono); font-size: 8px; color: var(--tmut); letter-spacing: 2px; }
+
+    .sigb { display: flex; align-items: center; justify-content: space-between; padding: 5px 12px; background: var(--panel); border-top: 1px solid var(--brd); flex-shrink: 0; }
+    .sigl { display: flex; align-items: center; gap: 10px; }
+    .lts { display: flex; gap: 4px; background: #0d1014; border: 1px solid var(--brd); border-radius: 2px; padding: 4px 6px; }
+    .lt { width: 9px; height: 9px; border-radius: 50%; background: #1c2028; transition: all 0.3s; }
+    .lt.r.on { background: var(--red); box-shadow: 0 0 7px var(--red); }
+    .lt.y.on { background: var(--yel); box-shadow: 0 0 7px var(--yel); }
+    .lt.g.on { background: var(--grn); box-shadow: 0 0 7px var(--grn); }
+    .sst { font-size: 13px; font-weight: 700; letter-spacing: 3px; color: var(--tdim); min-width: 80px; transition: color 0.3s; }
+    .sst.red { color: var(--red); }
+    .sst.green { color: var(--grn); }
+    .sst.yellow { color: var(--yel); }
+    .cng { font-family: var(--mono); font-size: 9px; padding: 2px 7px; border-radius: 2px; letter-spacing: 1px; text-transform: uppercase; }
+    .cng.heavy { background: var(--rd); color: var(--red); border: 1px solid #3a1a1a; }
+    .cng.medium { background: var(--yd); color: var(--yel); border: 1px solid #3a2a10; }
+    .cng.low { background: var(--gd); color: var(--grn); border: 1px solid #183a20; }
+    .tmr { font-family: var(--mono); font-size: 20px; font-weight: 600; color: var(--white); letter-spacing: 1px; min-width: 44px; text-align: right; }
+
+    /* MODAL */
+    .mbg { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(6,8,10,0.88); backdrop-filter: blur(6px); align-items: center; justify-content: center; }
+    .mbg.on { display: flex; }
+    .modal { background: var(--panel); border: 1px solid var(--brd2); border-radius: 4px; width: 680px; max-width: 96vw; max-height: 86vh; overflow: hidden; display: flex; flex-direction: column; }
+    .mhd { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--brd); flex-shrink: 0; }
+    .mttl { font-size: 17px; font-weight: 700; color: var(--white); letter-spacing: 3px; }
+    .mclose { background: none; border: 1px solid var(--brd2); border-radius: 2px; color: var(--tdim); cursor: pointer; padding: 4px 10px; font-family: var(--mono); font-size: 10px; letter-spacing: 1px; transition: all 0.2s; }
+    .mclose:hover { border-color: var(--red); color: var(--red); }
+    .mbody { padding: 20px; overflow-y: auto; flex: 1; }
+    .rsec { margin-bottom: 20px; }
+    .rlbl { font-family: var(--mono); font-size: 9px; color: var(--tmut); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--brd); }
+    .rt { width: 100%; border-collapse: collapse; }
+    .rt th,.rt td { padding: 7px 12px; text-align: left; font-family: var(--mono); font-size: 10px; border-bottom: 1px solid var(--brd); }
+    .rt th { color: var(--tmut); letter-spacing: 1px; text-transform: uppercase; font-weight: 400; }
+    .rt td { color: var(--txt); letter-spacing: 0.5px; }
+    .rt tr:last-child td { border-bottom: none; }
+    .rt td.ok { color: var(--grn); }
+    .rt td.err { color: var(--red); }
+    .rt td.yl { color: var(--yel); }
+    .rt td.bl { color: var(--blu); }
+    .mft { display: flex; justify-content: flex-end; gap: 10px; padding: 12px 20px; border-top: 1px solid var(--brd); flex-shrink: 0; }
+    .dlbtn { display: flex; align-items: center; gap: 6px; background: var(--bd); border: 1px solid var(--blu); border-radius: 2px; padding: 7px 16px; cursor: pointer; font-family: var(--mono); font-size: 10px; color: var(--blu); letter-spacing: 1px; transition: all 0.2s; }
+    .dlbtn:hover { background: rgba(58,176,232,0.12); }
+
+    /* LOG STRIP */
+    .logstrip { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; background: var(--panel); border-top: 1px solid var(--brd); display: flex; align-items: center; height: 28px; padding: 0 16px; }
+    .ltag { font-family: var(--mono); font-size: 9px; color: var(--tmut); letter-spacing: 2px; margin-right: 12px; flex-shrink: 0; }
+    .lmsgs { display: flex; gap: 28px; align-items: center; font-family: var(--mono); font-size: 10px; flex: 1; overflow: hidden; }
+    .lm { white-space: nowrap; color: var(--tdim); }
+    .lm.ok { color: var(--grn); }
+    .lm.alert { color: var(--red); }
+    .lm.info { color: var(--blu); }
+  </style>
+</head>
+
+<body>
+
+  <div class="hdr">
+    <div class="hd-l">
+      <a href="index.html" class="back-btn">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        HOME
+      </a>
+      <div class="badge">TCMS-v2</div>
+      <div>
+        <div class="hd-title">Traffic Control System</div>
+        <div class="hd-sub">ADAPTIVE SIGNAL · YOLOV8 DETECTION · 4-WAY INTERSECTION</div>
+      </div>
+    </div>
+    <div class="hd-r">
+      <div class="live"><div class="dot"></div>LIVE FEED</div>
+      <div class="clk" id="clock">--:--:--</div>
+    </div>
+  </div>
+
+  <div class="emgb" id="emgBanner">
+    <div class="emgt" id="emgText">🚨 EMERGENCY VEHICLE DETECTED</div>
+  </div>
+
+  <div class="topbar">
+    <div class="tst">
+      <div><div class="tst-l">Active Lane</div><div class="tst-v bl" id="stActive">--</div></div>
+    </div>
+    <div class="tst">
+      <div><div class="tst-l">Total Detected</div><div class="tst-v" id="stTotal">--</div></div>
+    </div>
+    <div class="tst">
+      <div><div class="tst-l">Emergency</div><div class="tst-v ok" id="stEmg">CLEAR</div></div>
+    </div>
+    <div class="tst" style="border-right:none;">
+      <div><div class="tst-l">System</div><div class="tst-v ok" id="stSys">RUNNING</div></div>
+    </div>
+    <div class="sp"></div>
+    <button class="rbtn" onclick="openReport()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14,2 14,8 20,8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      GENERATE REPORT
+    </button>
+  </div>
+
+  <div class="grid">
+
+    <!-- NORTH -->
+    <div class="cam sr" id="panel-north">
+      <div class="cam-top"><div class="cname">↑ NORTH</div><div class="cid">CAM-01</div></div>
+      <div class="vw">
+        <video id="vid-north" muted loop playsinline autoplay><source src="north.mp4" type="video/mp4"></video>
+        <div class="nof" id="nf-north"><div class="nof-i">📷</div><div class="nof-t">NO FEED · CAM-01</div></div>
+        <div class="vcnt" id="cnt-north">-- vehicles</div>
+        <div class="etag" id="etag-north">AMBULANCE</div>
+        <div class="stov on" id="ov-north"><div class="si"><div class="sb">STOP</div><div class="ss">SIGNAL RED</div></div></div>
+      </div>
+      <div class="sigb">
+        <div class="sigl">
+          <div class="lts"><div class="lt r on" id="nr"></div><div class="lt y" id="ny"></div><div class="lt g" id="ng"></div></div>
+          <div class="sst red" id="nl">RED</div>
+        </div>
+        <div class="cng low" id="nc">--</div>
+        <div class="tmr" id="nt">--</div>
+      </div>
+    </div>
+
+    <!-- SOUTH -->
+    <div class="cam sr" id="panel-south">
+      <div class="cam-top"><div class="cname">↓ SOUTH</div><div class="cid">CAM-02</div></div>
+      <div class="vw">
+        <video id="vid-south" muted loop playsinline autoplay><source src="south.mp4" type="video/mp4"></video>
+        <div class="nof" id="nf-south"><div class="nof-i">📷</div><div class="nof-t">NO FEED · CAM-02</div></div>
+        <div class="vcnt" id="cnt-south">-- vehicles</div>
+        <div class="etag" id="etag-south">AMBULANCE</div>
+        <div class="stov on" id="ov-south"><div class="si"><div class="sb">STOP</div><div class="ss">SIGNAL RED</div></div></div>
+      </div>
+      <div class="sigb">
+        <div class="sigl">
+          <div class="lts"><div class="lt r on" id="sr"></div><div class="lt y" id="sy"></div><div class="lt g" id="sg"></div></div>
+          <div class="sst red" id="sl">RED</div>
+        </div>
+        <div class="cng low" id="sc">--</div>
+        <div class="tmr" id="st">--</div>
+      </div>
+    </div>
+
+    <!-- EAST -->
+    <div class="cam sr" id="panel-east">
+      <div class="cam-top"><div class="cname">→ EAST</div><div class="cid">CAM-03</div></div>
+      <div class="vw">
+        <video id="vid-east" muted loop playsinline autoplay><source src="output_east.mp4" type="video/mp4"></video>
+        <div class="nof" id="nf-east"><div class="nof-i">📷</div><div class="nof-t">NO FEED · CAM-03</div></div>
+        <div class="vcnt" id="cnt-east">-- vehicles</div>
+        <div class="etag" id="etag-east">AMBULANCE</div>
+        <div class="stov on" id="ov-east"><div class="si"><div class="sb">STOP</div><div class="ss">SIGNAL RED</div></div></div>
+      </div>
+      <div class="sigb">
+        <div class="sigl">
+          <div class="lts"><div class="lt r on" id="er"></div><div class="lt y" id="ey"></div><div class="lt g" id="eg"></div></div>
+          <div class="sst red" id="el">RED</div>
+        </div>
+        <div class="cng low" id="ec">--</div>
+        <div class="tmr" id="et">--</div>
+      </div>
+    </div>
+
+    <!-- WEST -->
+    <div class="cam sr" id="panel-west">
+      <div class="cam-top"><div class="cname">← WEST</div><div class="cid">CAM-04</div></div>
+      <div class="vw">
+        <video id="vid-west" muted loop playsinline autoplay><source src="output_west.mp4" type="video/mp4"></video>
+        <div class="nof" id="nf-west"><div class="nof-i">📷</div><div class="nof-t">NO FEED · CAM-04</div></div>
+        <div class="vcnt" id="cnt-west">-- vehicles</div>
+        <div class="etag" id="etag-west">AMBULANCE</div>
+        <div class="stov on" id="ov-west"><div class="si"><div class="sb">STOP</div><div class="ss">SIGNAL RED</div></div></div>
+      </div>
+      <div class="sigb">
+        <div class="sigl">
+          <div class="lts"><div class="lt r on" id="wr"></div><div class="lt y" id="wy"></div><div class="lt g" id="wg"></div></div>
+          <div class="sst red" id="wl">RED</div>
+        </div>
+        <div class="cng low" id="wc">--</div>
+        <div class="tmr" id="wt">--</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="logstrip">
+    <div class="ltag">SYS LOG</div>
+    <div class="lmsgs">
+      <span class="lm info" id="log1">Initializing...</span>
+      <span class="lm" id="log2"></span>
+      <span class="lm" id="log3"></span>
+    </div>
+  </div>
+
+  <div class="mbg" id="reportModal">
+    <div class="modal">
+      <div class="mhd">
+        <div class="mttl">INTERSECTION REPORT</div>
+        <button class="mclose" onclick="closeReport()">✕ CLOSE</button>
+      </div>
+      <div class="mbody" id="reportBody">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--tdim);text-align:center;padding:30px;">Loading...</div>
+      </div>
+      <div class="mft">
+        <button class="dlbtn" onclick="dlReport()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          DOWNLOAD JSON
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DIR_IDS = {
+      north: { r:'nr',y:'ny',g:'ng',lbl:'nl',cng:'nc',tmr:'nt',cnt:'cnt-north',ov:'ov-north',et:'etag-north',pnl:'panel-north',nf:'nf-north',vid:'vid-north' },
+      south: { r:'sr',y:'sy',g:'sg',lbl:'sl',cng:'sc',tmr:'st',cnt:'cnt-south',ov:'ov-south',et:'etag-south',pnl:'panel-south',nf:'nf-south',vid:'vid-south' },
+      east:  { r:'er',y:'ey',g:'eg',lbl:'el',cng:'ec',tmr:'et',cnt:'cnt-east', ov:'ov-east', et:'etag-east', pnl:'panel-east', nf:'nf-east', vid:'vid-east'  },
+      west:  { r:'wr',y:'wy',g:'wg',lbl:'wl',cng:'wc',tmr:'wt',cnt:'cnt-west', ov:'ov-west', et:'etag-west', pnl:'panel-west', nf:'nf-west', vid:'vid-west'  },
+    };
+    const DIRS = ['north','south','east','west'];
+    const YELLOW_DUR = 3, MIN_GREEN = 10, MAX_GREEN = 45, POLL_MS = 4000;
+
+    let vCounts = {north:0,south:0,east:0,west:0};
+    let rptData = null;
+    let emgOn = false, emgLane = null, activeDir = null;
+    let cyTmr = null, cdTmr = null, emgTmr = null;
+    let lastEmgKey = '';
+
+    function tickClock() { document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-IN',{hour12:false}); }
+    setInterval(tickClock,1000); tickClock();
+
+    function initVideos() {
+      DIRS.forEach(d => {
+        const ids = DIR_IDS[d];
+        const v = document.getElementById(ids.vid);
+        const p = document.getElementById(ids.nf);
+        if (!v||!p) return;
+        v.addEventListener('error', ()=>{ v.style.display='none'; p.classList.add('on'); });
+        v.addEventListener('loadeddata', ()=>{ v.style.display='block'; p.classList.remove('on'); });
+        v.play().catch(()=>{});
+      });
+    }
+
+    function sig(dir, state) {
+      const ids = DIR_IDS[dir];
+      const r = document.getElementById(ids.r), y = document.getElementById(ids.y), g = document.getElementById(ids.g);
+      const lbl = document.getElementById(ids.lbl), pnl = document.getElementById(ids.pnl);
+      const ov = document.getElementById(ids.ov), et = document.getElementById(ids.et);
+      if (!r||!lbl||!pnl||!ov||!et) return;
+      [r,y,g].forEach(e=>e.classList.remove('on'));
+      pnl.className='cam'; et.classList.remove('on');
+      if (state==='red')    { r.classList.add('on'); lbl.textContent='RED';      lbl.className='sst red';    pnl.classList.add('sr'); ov.classList.add('on'); }
+      else if (state==='yellow') { y.classList.add('on'); lbl.textContent='WAIT'; lbl.className='sst yellow'; pnl.classList.add('sy'); ov.classList.remove('on'); }
+      else if (state==='green')  { g.classList.add('on'); lbl.textContent='GO';   lbl.className='sst green';  pnl.classList.add('sg'); ov.classList.remove('on'); }
+      else if (state==='emg')    { g.classList.add('on'); lbl.textContent='PRIORITY'; lbl.className='sst green'; pnl.classList.add('se'); ov.classList.remove('on'); et.classList.add('on'); }
+    }
+    function allRed() { DIRS.forEach(d=>sig(d,'red')); allTmr(null); }
+    function tmr(dir,v) { const e=document.getElementById(DIR_IDS[dir].tmr); if(e) e.textContent=(v===null||v===undefined)?'--':v+'s'; }
+    function allTmr(v) { DIRS.forEach(d=>tmr(d,v)); }
+    function greenTime(d) { return Math.max(MIN_GREEN,Math.min(MAX_GREEN,10+vCounts[d]*2)); }
+    function sortDirs() { return DIRS.slice().sort((a,b)=>vCounts[b]-vCounts[a]); }
+    function clrTimers() { clearTimeout(cyTmr); clearInterval(cdTmr); clearInterval(emgTmr); }
+    function log(msg,type,slot) { const e=document.getElementById('log'+slot); if(!e) return; e.textContent=msg; e.className='lm'+(type?' '+type:''); }
+
+    function updCong(d,c) {
+      const e=document.getElementById(DIR_IDS[d].cng); if(!e) return;
+      if(!c){ e.className='cng low'; e.textContent='--'; return; }
+      const cl=c>=15?'heavy':c>=7?'medium':'low';
+      e.className='cng '+cl; e.textContent=cl.charAt(0).toUpperCase()+cl.slice(1);
+    }
+    function updVcnt(d,c) { const e=document.getElementById(DIR_IDS[d].cnt); if(e) e.textContent=(c>0)?c+' vehicles':'-- vehicles'; }
+    function updTopbar() {
+      document.getElementById('stActive').textContent=activeDir?activeDir.toUpperCase():'--';
+      const tot=Object.values(vCounts).reduce((a,b)=>a+b,0);
+      document.getElementById('stTotal').textContent=tot>0?tot:'--';
+    }
+
+    function runCycle() {
+      if (emgOn) return;
+      clrTimers();
+      const ord=sortDirs(), nxt=ord[0];
+      activeDir=nxt; updTopbar();
+      const gt=greenTime(nxt);
+      allRed();
+      log('Switching → '+nxt.toUpperCase(),'info',1);
+      log('Queue: '+ord.map(d=>d.toUpperCase()+'('+vCounts[d]+')').join(' › '),'',2);
+      log('Green time: '+gt+'s','ok',3);
+      sig(nxt,'yellow'); let yc=YELLOW_DUR; tmr(nxt,yc);
+      cdTmr=setInterval(()=>{ yc--; tmr(nxt,yc); if(yc<=0) clearInterval(cdTmr); },1000);
+      cyTmr=setTimeout(()=>{
+        if(emgOn) return;
+        sig(nxt,'green'); let gc=gt; tmr(nxt,gc);
+        cdTmr=setInterval(()=>{
+          if(emgOn){ clearInterval(cdTmr); return; }
+          gc--; tmr(nxt,gc);
+          if(gc<=0){
+            clearInterval(cdTmr);
+            sig(nxt,'yellow'); let y2=YELLOW_DUR; tmr(nxt,y2);
+            const yy=setInterval(()=>{ y2--; tmr(nxt,y2); if(y2<=0) clearInterval(yy); },1000);
+            cyTmr=setTimeout(()=>{ if(!emgOn) runCycle(); },YELLOW_DUR*1000);
+          }
+        },1000);
+      },YELLOW_DUR*1000);
+    }
+
+    function trigEmg(lane) {
+      emgOn=true; emgLane=lane; clrTimers();
+      document.getElementById('emgBanner').classList.add('on');
+      document.getElementById('emgText').textContent='🚨 AMBULANCE DETECTED — '+lane.toUpperCase()+' LANE PRIORITY';
+      const se=document.getElementById('stEmg'); se.textContent='ACTIVE'; se.className='tst-v err';
+      document.getElementById('stSys').textContent='EMERGENCY'; document.getElementById('stSys').className='tst-v err';
+      activeDir=lane; updTopbar();
+      allRed();
+      log('🚨 AMBULANCE → '+lane.toUpperCase(),'alert',1);
+      log('All other lanes → RED','alert',2);
+      log('Priority green · 25s','alert',3);
+      setTimeout(()=>{
+        sig(lane,'emg'); let t=25; tmr(lane,t);
+        emgTmr=setInterval(()=>{ t--; tmr(lane,t); if(t<=0){ clearInterval(emgTmr); clrEmg(); } },1000);
+      },400);
+    }
+
+    function clrEmg() {
+      emgOn=false; emgLane=null; clrTimers();
+      document.getElementById('emgBanner').classList.remove('on');
+      const se=document.getElementById('stEmg'); se.textContent='CLEAR'; se.className='tst-v ok';
+      document.getElementById('stSys').textContent='RUNNING'; document.getElementById('stSys').className='tst-v ok';
+      allRed();
+      log('✓ Emergency cleared','ok',1); log('Resuming normal cycle','',2); log('','',3);
+      setTimeout(runCycle,1500);
+    }
+
+    async function loadData() {
+      try {
+        const res=await fetch('emergency.json?t='+Date.now());
+        if(!res.ok) throw new Error('not found');
+        const data=await res.json();
+        rptData=data;
+        const rpt=data.report||{};
+        DIRS.forEach(d=>{ const r=rpt[d]; if(r&&!r.skipped){ vCounts[d]=r.unique_vehicles||0; updVcnt(d,vCounts[d]); updCong(d,vCounts[d]); } });
+        updTopbar();
+        const hasEmg=!!data.has_emergency, emgDirs=data.emergency_directions||[];
+        const lane=emgDirs.length>0?emgDirs[0]:null;
+        const key=lane+'_'+(rpt[lane]?.unique_ambulances||0);
+        if(hasEmg&&lane&&key!==lastEmgKey&&!emgOn){ lastEmgKey=key; trigEmg(lane); }
+        else if(!hasEmg&&emgOn){ clrEmg(); }
+        log('Data loaded · '+new Date().toLocaleTimeString('en-IN',{hour12:false}),'ok',1);
+      } catch(e) {
+        log('Waiting for emergency.json — run detect.py first','',1);
+        log('','',2); log('','',3);
+      }
+    }
+
+    function openReport() {
+      document.getElementById('reportModal').classList.add('on');
+      const body=document.getElementById('reportBody');
+      if(!rptData){ body.innerHTML='<div style="font-family:var(--mono);font-size:10px;color:var(--red);text-align:center;padding:30px;">No data yet. Run detect.py first.</div>'; return; }
+      const rpt=rptData.report||{}, ts=new Date().toLocaleString('en-IN');
+      let rows='';
+      DIRS.forEach(d=>{
+        const r=rpt[d]||{};
+        if(r.skipped){ rows+=`<tr><td>${d.toUpperCase()}</td><td class="yl">SKIPPED</td><td>--</td><td>--</td><td>--</td><td>--</td></tr>`; }
+        else { const amb=r.ambulance_detected?'<span style="color:var(--red)">YES ✓</span>':'No', pol=r.police_detected?'<span style="color:var(--yel)">YES ✓</span>':'No';
+          rows+=`<tr><td>${d.toUpperCase()}</td><td class="ok">ACTIVE</td><td class="bl">${r.unique_vehicles||0}</td><td>${r.unique_ambulances||0} — ${amb}</td><td>${r.unique_police||0} — ${pol}</td><td style="color:var(--tdim)">${r.frames_processed||0}</td></tr>`; }
+      });
+      const emgDirs=(rptData.emergency_directions||[]).join(', ').toUpperCase()||'None';
+      const tot=Object.values(vCounts).reduce((a,b)=>a+b,0);
+      body.innerHTML=`<div class="rsec"><div class="rlbl">Summary</div><table class="rt"><tr><th>Generated</th><td>${ts}</td></tr><tr><th>Emergency</th><td class="${rptData.has_emergency?'err':'ok'}">${rptData.has_emergency?'DETECTED':'ALL CLEAR'}</td></tr><tr><th>Emergency Lanes</th><td class="${rptData.has_emergency?'err':''}">${emgDirs}</td></tr><tr><th>Total Vehicles</th><td class="bl">${tot}</td></tr></table></div><div class="rsec"><div class="rlbl">Per-Direction Breakdown</div><table class="rt"><thead><tr><th>Dir</th><th>Status</th><th>Vehicles</th><th>Ambulances</th><th>Police</th><th>Frames</th></tr></thead><tbody>${rows}</tbody></table></div><div class="rsec"><div class="rlbl">Raw JSON</div><pre style="font-family:var(--mono);font-size:9px;color:var(--tdim);background:var(--sur);padding:12px;border-radius:2px;overflow:auto;max-height:160px;">${JSON.stringify(rptData,null,2)}</pre></div>`;
+    }
+    function closeReport() { document.getElementById('reportModal').classList.remove('on'); }
+    function dlReport() {
+      if(!rptData) return;
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(new Blob([JSON.stringify(rptData,null,2)],{type:'application/json'}));
+      a.download='traffic_report_'+new Date().toISOString().slice(0,19).replace(/:/g,'-')+'.json';
+      a.click();
+    }
+    document.getElementById('reportModal').addEventListener('click',function(e){ if(e.target===this) closeReport(); });
+
+    async function init() {
+      initVideos();
+      await loadData();
+      if(!emgOn) setTimeout(runCycle,1000);
+      setInterval(loadData,POLL_MS);
+    }
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+{
+    "has_emergency": true,
+    "emergency_directions": [
+        "west"
+    ],
+    "report": {
+        "north": {
+            "video": "north.mp4",
+            "output_video": "output_north.mp4",
+            "frames_processed": 783,
+            "ambulance_detected": false,
+            "police_detected": true,
+            "unique_vehicles": 57,
+            "unique_ambulances": 0,
+            "unique_police": 2,
+            "skipped": false
+        },
+        "south": {
+            "video": "south.mp4",
+            "output_video": "output_south.mp4",
+            "frames_processed": 653,
+            "ambulance_detected": false,
+            "police_detected": true,
+            "unique_vehicles": 56,
+            "unique_ambulances": 0,
+            "unique_police": 2,
+            "skipped": false
+        },
+        "east": {
+            "video": "east.mp4",
+            "output_video": "output_east.mp4",
+            "frames_processed": 626,
+            "ambulance_detected": false,
+            "police_detected": true,
+            "unique_vehicles": 35,
+            "unique_ambulances": 0,
+            "unique_police": 2,
+            "skipped": false
+        },
+        "west": {
+            "video": "west.mp4",
+            "output_video": "output_west.mp4",
+            "frames_processed": 624,
+            "ambulance_detected": true,
+            "police_detected": true,
+            "unique_vehicles": 56,
+            "unique_ambulances": 1,
+            "unique_police": 7,
+            "skipped": false
+        }
+    }
+}
